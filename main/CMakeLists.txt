@@ -1,4 +1,5 @@
 idf_component_register(SRCS
+                        "atl_config.c"
                         "atl_led.c"
                         "atl_main.c"
                         "atl_storage.c"
