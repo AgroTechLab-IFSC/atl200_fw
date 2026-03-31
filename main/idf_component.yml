@@ -1,2 +1,6 @@
 dependencies:
-  espressif/led_strip: "^3.0.0"
+  # ESP-IDF version 6.0.0 or higher is required for this component.
+  idf: "^6.0.0"
+
+  # The led_strip component is required for controlling the LED strip.
+  espressif/led_strip: "^3.0.3"
