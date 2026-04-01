@@ -1,5 +1,7 @@
 name: Build ESP-IDF project
 on: [push, pull_request]
+permissions:
+  contents: read
 
 jobs:
   build:
