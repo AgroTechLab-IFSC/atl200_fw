@@ -4,17 +4,16 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: espressif/idf:v6.0
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-            path: agrotechlab/atl200_fw
+            submodules: 'recursive'
 
       - name: Build ESP-IDF project
-        uses: espressif/build-esp-idf-projects-action@v1
+        uses: espressif/esp-idf-ci-action@v1
         with:
-          idf_path: /opt/esp-idf
-          target: esp32s3
-          paths: "agrotechlab/atl200_fw"
+            esp_idf_version: v6.0
+            target: esp32s3
+            paths: 'agrotechlab/atl200_fw'
