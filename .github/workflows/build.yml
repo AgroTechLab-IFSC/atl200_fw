@@ -16,4 +16,4 @@ jobs:
         with:
             esp_idf_version: v6.0
             target: esp32s3
-            paths: 'agrotechlab/atl200_fw'
+            path: 'agrotechlab/atl200_fw'
