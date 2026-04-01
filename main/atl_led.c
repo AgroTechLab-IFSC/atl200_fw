@@ -60,12 +60,12 @@ static void atl_led_task(void *args) {
 
         // } else {
 
-            /* Toogle period */
+            /* Toggle period */
             vTaskDelay(pdMS_TO_TICKS(CONFIG_ATL_LED_PERIOD));
 
         // }
 
-        /* Toogle led builtin */
+        /* Toggle led builtin */
         atl_led_toggle();
     }    
 }
@@ -86,14 +86,13 @@ const char* atl_led_get_behaviour_str(atl_led_behaviour_e behaviour) {
  */
 atl_led_behaviour_e atl_led_get_behaviour(char *behaviour_str) {
     uint8_t i = 0;
-    while (atl_led_behaviour_str[i] != NULL) {
+    uint8_t count = sizeof(atl_led_behaviour_str) / sizeof(atl_led_behaviour_str[0]);
+    for (i = 0; i < count; i++) {
         if (strcmp(behaviour_str, atl_led_behaviour_str[i]) == 0) {
             return i;
-        } else {
-            i++;
         }
     }
-    return 255;
+    return ATL_LED_BEHAVIOUR_INVALID;
 }
 
 /**
@@ -206,13 +205,13 @@ esp_err_t atl_led_toggle(void) {
     /* Refresh the strip to send data */
     err = led_strip_refresh(atl_led_strip);
     
+    /* Update led state variable */
+    atl_led_state = !atl_led_state;
+    
     /* Give semaphore */
     if (!xSemaphoreGive(atl_led_mutex)) {
         ESP_LOGW(TAG, "Fail giving LED mutex");
     }
-
-    /* Update led state variable */
-    atl_led_state = !atl_led_state;
 
     return err;
 }

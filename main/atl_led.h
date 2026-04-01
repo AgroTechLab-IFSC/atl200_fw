@@ -24,6 +24,7 @@ typedef enum {
     ATL_LED_ENABLED_FAILS,              /**< LED enabled (fails). */
     ATL_LED_ENABLED_COMM_FAILS,         /**< LED enabled (communication fails). */
     ATL_LED_ENABLED_FULL,               /**< LED enabled (full). */
+    ATL_LED_BEHAVIOUR_INVALID,          /**< Invalid LED behaviour. */
 } atl_led_behaviour_e;
 
 /**

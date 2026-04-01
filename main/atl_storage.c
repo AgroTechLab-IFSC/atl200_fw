@@ -27,6 +27,10 @@ esp_err_t atl_storage_init(void) {
 
     /* Start NVS */
     err = nvs_flash_init();
+    if (err != ESP_OK && err != ESP_ERR_NVS_NO_FREE_PAGES && err != ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_LOGE(TAG, "Fail initializing NVS");
+        goto error_proc;
+    }
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_LOGW(TAG, "Erasing and restarting NVS");
         err = nvs_flash_erase();
