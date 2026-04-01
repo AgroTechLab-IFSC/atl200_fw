@@ -1,6 +1,6 @@
 /**
  * @file atl_config.c
- * @author Robson Costa (robson.costa@ifs.edu.br)
+ * @author Robson Costa (robson.costa@ifsc.edu.br)
  * @brief Source file for configuration management.
  */
 #include <string.h>
@@ -57,7 +57,7 @@ static void atl_config_create_default(void) {
  */
 esp_err_t atl_config_init(void) {
     esp_err_t err = ESP_OK;
-    nvs_handle_t nvs_handler;
+    nvs_handle_t nvs_handler = 0;
 
     ESP_LOGI(TAG, "Starting configuration management");
 
@@ -105,13 +105,17 @@ esp_err_t atl_config_init(void) {
 
     /* Close NVS */
     ESP_LOGI(TAG, "Unmounting NVS storage");
-    nvs_close(nvs_handler);
+    if (nvs_handler) {
+        nvs_close(nvs_handler);
+    }
     return ESP_OK;
 
 /* Error procedure */
 error_proc:
     ESP_LOGE(TAG, "Error: %s", esp_err_to_name(err));
-    nvs_close(nvs_handler);
+    if (nvs_handler) {
+        nvs_close(nvs_handler);
+    }
     atl_led_blink_error();
     return err;
 }
@@ -122,7 +126,7 @@ error_proc:
  */
 static esp_err_t atl_config_commit_nvs(void) {
     esp_err_t err = ESP_OK;
-    nvs_handle_t nvs_handler;
+    nvs_handle_t nvs_handler = 0;
     ESP_LOGD(TAG, "Committing configuration at NVS");    
     
     /* Open NVS system */
@@ -148,13 +152,17 @@ static esp_err_t atl_config_commit_nvs(void) {
 
     /* Close NVS */
     ESP_LOGD(TAG, "Unmounting NVS storage");
-    nvs_close(nvs_handler);
+    if (nvs_handler) {
+        nvs_close(nvs_handler);
+    }
     return ESP_OK;
 
 /* Error procedure */
 error_proc:
     ESP_LOGE(TAG, "Error: %s", esp_err_to_name(err));
-    nvs_close(nvs_handler);
+    if (nvs_handler) {
+        nvs_close(nvs_handler);
+    }
     return err;
 }
 
@@ -164,6 +172,11 @@ error_proc:
  * @param[out] config_ptr pointer to write configuration.
  */
 void atl_config_get(atl_config_t *config_ptr) {
+
+    if (config_ptr == NULL) {
+        ESP_LOGE(TAG, "Invalid pointer to write configuration");
+        return;
+    }
 
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
@@ -186,6 +199,12 @@ void atl_config_get(atl_config_t *config_ptr) {
  * @param[in] config_ptr pointer with new configuration.
  */
 void atl_config_set(atl_config_t *config_ptr) {
+    
+    if (config_ptr == NULL) {
+        ESP_LOGE(TAG, "Invalid pointer with new configuration");
+        return;
+    }
+
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
         ESP_LOGE(TAG, "Timeout taking mutex");
@@ -214,6 +233,11 @@ void atl_config_set(atl_config_t *config_ptr) {
  */
 void atl_config_led_get(atl_led_config_t *led_config_ptr) {
 
+    if (led_config_ptr == NULL) {
+        ESP_LOGE(TAG, "Invalid pointer to write configuration");
+        return;
+    }
+
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
         ESP_LOGE(TAG, "Timeout taking mutex");
@@ -236,6 +260,11 @@ void atl_config_led_get(atl_led_config_t *led_config_ptr) {
  */
 void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
+    if (led_config_ptr == NULL) {
+        ESP_LOGE(TAG, "Invalid pointer with new configuration");
+        return;
+    }
+    
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
         ESP_LOGE(TAG, "Timeout taking mutex");
