@@ -16,4 +16,4 @@ jobs:
         with:
             esp_idf_version: v6.0
             target: esp32s3
-            path: 'agrotechlab/atl200_fw'
+            extra_docker_args: -v ./.ccache:/root/.ccache -e CCACHE_DIR=/root/.ccache
