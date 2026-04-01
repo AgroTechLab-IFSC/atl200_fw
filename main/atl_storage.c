@@ -54,7 +54,7 @@ error_proc:
  * @details Erase NVS.
  * @return esp_err_t - If ERR_OK success. 
  */
-esp_err_t fcas_storage_erase_nvs(void) {
+esp_err_t atl_storage_erase_nvs(void) {
     esp_err_t err = ESP_OK;
     err = nvs_flash_erase();
     if (err != ESP_OK) {
