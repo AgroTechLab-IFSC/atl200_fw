@@ -4,10 +4,14 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: espressif/idf:latest
+    container: espressif/idf:v6.0
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: espressif/build-esp-idf-projects-action@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build ESP-IDF project
+        uses: espressif/build-esp-idf-projects-action@v1
         with:
           idf_path: /opt/esp-idf
           target: esp32s3
