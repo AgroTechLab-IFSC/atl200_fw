@@ -8,10 +8,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+            path: main
 
       - name: Build ESP-IDF project
         uses: espressif/build-esp-idf-projects-action@v1
         with:
           idf_path: /opt/esp-idf
           target: esp32s3
+          path: main
