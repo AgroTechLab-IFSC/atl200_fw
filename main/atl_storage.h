@@ -1,7 +1,8 @@
 /**
  * @file atl_storage.h
- * @author Robson Costa (robson.costa@ifsc.edu.br)
  * @brief Header file for NVS (Non-Volatile Storage) management.
+ * @author Robson Costa (robson.costa@ifsc.edu.br)
+ * @copyright CC-BY-SA-4.0 license
  */
 #pragma once
 

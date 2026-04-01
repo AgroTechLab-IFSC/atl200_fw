@@ -1,7 +1,8 @@
 /**
  * @file atl_storage.c
- * @author Robson Costa (robson.costa@ifsc.edu.br)
  * @brief Source file for NVS (Non-Volatile Storage) management.
+ * @author Robson Costa (robson.costa@ifsc.edu.br)
+ * @copyright CC-BY-SA-4.0 license
  */
 #include <esp_err.h>
 #include <esp_log.h>

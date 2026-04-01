@@ -1,7 +1,8 @@
 /**
  * @file atl_config.c
- * @author Robson Costa (robson.costa@ifsc.edu.br)
  * @brief Source file for configuration management.
+ * @author Robson Costa (robson.costa@ifsc.edu.br)
+ * @copyright CC-BY-SA-4.0 license
  */
 #include <string.h>
 #include <freertos/FreeRTOS.h>
@@ -26,8 +27,8 @@ static atl_config_t atl_config;                   //!< Configuration structure.
  * @details Create configuration file with default values (based on MenuConfig). 
  */
 static void atl_config_create_default(void) {    
-    char ssid[32];
-    unsigned char mac[6] = {0};
+    // char ssid[32];
+    // unsigned char mac[6] = {0};
 
     /** Creates default LED configuration **/
     atl_config.led.behaviour = (atl_led_behaviour_e)ATL_LED_ENABLED_FULL;
@@ -105,17 +106,13 @@ esp_err_t atl_config_init(void) {
 
     /* Close NVS */
     ESP_LOGI(TAG, "Unmounting NVS storage");
-    if (nvs_handler) {
-        nvs_close(nvs_handler);
-    }
+    nvs_close(nvs_handler);
     return ESP_OK;
 
 /* Error procedure */
 error_proc:
     ESP_LOGE(TAG, "Error: %s", esp_err_to_name(err));
-    if (nvs_handler) {
-        nvs_close(nvs_handler);
-    }
+    nvs_close(nvs_handler);
     atl_led_blink_error();
     return err;
 }
@@ -152,17 +149,13 @@ static esp_err_t atl_config_commit_nvs(void) {
 
     /* Close NVS */
     ESP_LOGD(TAG, "Unmounting NVS storage");
-    if (nvs_handler) {
-        nvs_close(nvs_handler);
-    }
+    nvs_close(nvs_handler);
     return ESP_OK;
 
 /* Error procedure */
 error_proc:
     ESP_LOGE(TAG, "Error: %s", esp_err_to_name(err));
-    if (nvs_handler) {
-        nvs_close(nvs_handler);
-    }
+    nvs_close(nvs_handler);
     return err;
 }
 

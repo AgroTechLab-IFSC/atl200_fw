@@ -1,7 +1,8 @@
 /**
  * @file atl_config.h
- * @author Robson Costa (robson.costa@ifsc.edu.br)
  * @brief Header file for configuration management.
+ * @author Robson Costa (robson.costa@ifsc.edu.br)
+ * @copyright CC-BY-SA-4.0 license
  */
 #pragma once
 

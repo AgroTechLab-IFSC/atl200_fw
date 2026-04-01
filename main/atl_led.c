@@ -1,7 +1,8 @@
 /**
  * @file fcas_led.c
- * @author Robson Costa (robson@controlle.ind.br)
  * @brief Source file for LED management.
+ * @author Robson Costa (robson.costa@ifsc.edu.br)
+ * @copyright CC-BY-SA-4.0 license
  */
 #include <stdio.h>
 #include <string.h>

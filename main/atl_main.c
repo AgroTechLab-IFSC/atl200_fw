@@ -2,6 +2,7 @@
  * @file atl200_main.c
  * @brief Main file for the ATL200 firmware.
  * @author Robson Costa (robson.costa@ifsc.edu.br)
+ * @copyright CC-BY-SA-4.0 license
  */
 #include <stdio.h>
 #include <freertos/FreeRTOS.h>
