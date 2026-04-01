@@ -123,7 +123,7 @@ error_proc:
 static esp_err_t atl_config_commit_nvs(void) {
     esp_err_t err = ESP_OK;
     nvs_handle_t nvs_handler;
-    ESP_LOGD(TAG, "Commiting configuration at NVS");    
+    ESP_LOGD(TAG, "Committing configuration at NVS");    
     
     /* Open NVS system */
     err = nvs_open("nvs", NVS_READWRITE, &nvs_handler);
@@ -167,7 +167,8 @@ void atl_config_get(atl_config_t *config_ptr) {
 
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking mutex");
+        ESP_LOGE(TAG, "Timeout taking mutex");
+        return;
     }
     
     /* Get configuration */
@@ -175,7 +176,7 @@ void atl_config_get(atl_config_t *config_ptr) {
 
     /* Give semaphore */
     if (!xSemaphoreGive(atl_config_mutex)) {
-        ESP_LOGW(TAG, "Fail giving mutex");
+        ESP_LOGE(TAG, "Fail giving mutex");
     }
 }
 
@@ -187,7 +188,8 @@ void atl_config_get(atl_config_t *config_ptr) {
 void atl_config_set(atl_config_t *config_ptr) {
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking mutex");
+        ESP_LOGE(TAG, "Timeout taking mutex");
+        return;
     }
     
     /* Set configuration */
@@ -201,7 +203,7 @@ void atl_config_set(atl_config_t *config_ptr) {
 
     /* Give semaphore */
     if (!xSemaphoreGive(atl_config_mutex)) {
-        ESP_LOGW(TAG, "Fail giving mutex");
+        ESP_LOGE(TAG, "Fail giving mutex");
     }
 }
 
@@ -214,7 +216,8 @@ void atl_config_led_get(atl_led_config_t *led_config_ptr) {
 
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking mutex");
+        ESP_LOGE(TAG, "Timeout taking mutex");
+        return;
     }
     
     /* Get LED configuration */
@@ -222,7 +225,7 @@ void atl_config_led_get(atl_led_config_t *led_config_ptr) {
 
     /* Give semaphore */
     if (!xSemaphoreGive(atl_config_mutex)) {
-        ESP_LOGW(TAG, "Fail giving mutex");
+        ESP_LOGE(TAG, "Fail giving mutex");
     }
 }
 
@@ -235,7 +238,8 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
     /* Take semaphore */
     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking mutex");
+        ESP_LOGE(TAG, "Timeout taking mutex");
+        return;
     }
 
     /* Set LED configuration */
@@ -249,7 +253,7 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
     /* Give semaphore */
     if (!xSemaphoreGive(atl_config_mutex)) {
-        ESP_LOGW(TAG, "Fail giving mutex");
+        ESP_LOGE(TAG, "Fail giving mutex");
     }
 }
 
@@ -261,7 +265,8 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Take semaphore */
 //     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-//         ESP_LOGW(TAG, "Timeout taking mutex");
+//         ESP_LOGE(TAG, "Timeout taking mutex");
+//         return;
 //     }
 
 //     /* Get WiFi configuration */
@@ -269,7 +274,7 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Give semaphore */
 //     if (!xSemaphoreGive(atl_config_mutex)) {
-//         ESP_LOGW(TAG, "Fail giving mutex");
+//         ESP_LOGE(TAG, "Fail giving mutex");
 //     }
 // }
 
@@ -282,7 +287,8 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Take semaphore */
 //     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-//         ESP_LOGW(TAG, "Timeout taking mutex");
+//         ESP_LOGE(TAG, "Timeout taking mutex");
+//         return;
 //     }
 
 //     /* Set WiFi configuration */
@@ -296,7 +302,7 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Give semaphore */
 //     if (!xSemaphoreGive(atl_config_mutex)) {
-//         ESP_LOGW(TAG, "Fail giving mutex");
+//         ESP_LOGE(TAG, "Fail giving mutex");
 //     }
 // }
 
@@ -308,7 +314,8 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Take semaphore */
 //     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-//         ESP_LOGW(TAG, "Timeout taking mutex");
+//         ESP_LOGE(TAG, "Timeout taking mutex");
+//         return;
 //     }
 
 //     /* Get Webserver configuration */
@@ -316,7 +323,7 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Give semaphore */
 //     if (!xSemaphoreGive(atl_config_mutex)) {
-//         ESP_LOGW(TAG, "Fail giving mutex");
+//         ESP_LOGE(TAG, "Fail giving mutex");
 //     }
 // }
 
@@ -329,7 +336,8 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Take semaphore */
 //     if (!xSemaphoreTake(atl_config_mutex, pdMS_TO_TICKS(atl_config_mutex_timeout))) {
-//         ESP_LOGW(TAG, "Timeout taking mutex");
+//         ESP_LOGE(TAG, "Timeout taking mutex");
+//         return;
 //     }
 
 //     /* Set Webserver configuration */
@@ -343,6 +351,6 @@ void atl_config_led_set(atl_led_config_t *led_config_ptr) {
 
 //     /* Give semaphore */
 //     if (!xSemaphoreGive(atl_config_mutex)) {
-//         ESP_LOGW(TAG, "Fail giving mutex");
+//         ESP_LOGE(TAG, "Fail giving mutex");
 //     }
 // }
