@@ -13,5 +13,12 @@ menu "ATL200"
         default 2000
         help
             Define the blinking period (in milliseconds).
+    
+    config ATL_BUTTON_BUILTIN_PIN
+        int "Button GPIO number"
+        range 0 48
+        default 0
+        help
+            GPIO number (IOxx) for the built-in button.
 
 endmenu

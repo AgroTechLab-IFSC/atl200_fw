@@ -10,6 +10,7 @@
 #include <esp_log.h>
 #include "sdkconfig.h"
 #include "atl_led.h"
+#include "atl_button.h"
 #include "atl_storage.h"
 
 /* Constants */
@@ -26,6 +27,9 @@ void app_main(void) {
     
     /* Configure LED builtin */
     ret = atl_led_init();
+
+    /* Initialize button task */
+    ret = atl_button_init();
 
     /* Initialize NVS */
     ret = atl_storage_init();

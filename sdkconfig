@@ -974,6 +974,8 @@ CONFIG_PARTITION_TABLE_MD5=y
 CONFIG_ATL_LED_GPIO=8
 # default:
 CONFIG_ATL_LED_PERIOD=2000
+# default:
+CONFIG_ATL_BUTTON_BUILTIN_PIN=0
 # end of ATL200
 
 #
@@ -2345,7 +2347,6 @@ CONFIG_SPI_FLASH_ENABLE_ENCRYPTED_READ_WRITE=y
 # end of SPI Flash driver
 # end of Component config
 
-# default:
 # CONFIG_IDF_EXPERIMENTAL_FEATURES is not set
 
 # Deprecated options for backward compatibility

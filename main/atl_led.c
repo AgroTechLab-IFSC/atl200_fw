@@ -31,7 +31,7 @@ static led_strip_handle_t atl_led_strip;                       //!< LED handle.
 static atl_led_rgb_color_t atl_led_rgb_color = {0, 0, 255};   //!< LED color (default: blue).
 static TaskHandle_t atl_led_handle = NULL;                     //!< LED task handle.
 static uint8_t atl_button_count = 0;                           //!< Button pressed count.
-// extern bool atl_button_pressed;                                //!< Button pressed.
+extern bool atl_button_pressed;                                //!< Button pressed.
 
 /**
  * @brief LED builtin task
@@ -45,25 +45,26 @@ static void atl_led_task(void *args) {
     while (true) {
 
         /* Check if button was pressed */
-        // if (fcas_button_pressed) {
-        //     fcas_button_count++;
-        //     /* Check if is factory reset */
-        //     if (fcas_button_count == 10) {
-        //         ESP_LOGW(TAG, ">>> Executing factory reset <<<");
-        //         fcas_led_blink(10, 100, 255, 69, 0);
-        //         fcas_storage_erase_nvs();
-        //         esp_restart();
-        //     }
+        if (atl_button_pressed) {
+            atl_button_count++;
+            
+            /* Check if is factory reset */
+            if (atl_button_count == 10) {
+                ESP_LOGW(TAG, ">>> Executing factory reset <<<");
+                atl_led_blink(10, 100, 255, 69, 0);
+                atl_storage_erase_nvs();
+                esp_restart();
+            }
 
-        //     /* Toogle period */
-        //     vTaskDelay(pdMS_TO_TICKS(250));
+            /* Toggle period */
+            vTaskDelay(pdMS_TO_TICKS(250));
 
-        // } else {
+        } else {
 
             /* Toggle period */
             vTaskDelay(pdMS_TO_TICKS(CONFIG_ATL_LED_PERIOD));
 
-        // }
+        }
 
         /* Toggle led builtin */
         atl_led_toggle();

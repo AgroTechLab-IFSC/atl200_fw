@@ -1,8 +1,11 @@
 idf_component_register(SRCS
+                        "atl_button.c"
                         "atl_config.c"
                         "atl_led.c"
                         "atl_main.c"
                         "atl_storage.c"
                        PRIV_REQUIRES
                         "nvs_flash"
-                       INCLUDE_DIRS ".")
+                        "esp_driver_gpio"
+                       INCLUDE_DIRS 
+                        ".")
