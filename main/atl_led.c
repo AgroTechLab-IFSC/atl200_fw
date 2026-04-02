@@ -28,7 +28,7 @@ static const char *atl_led_behaviour_str[] = {         //!< LED behaviour string
 static SemaphoreHandle_t atl_led_mutex;                        //!< LED mutex.
 static bool atl_led_state = false;                             //!< LED enabled.
 static led_strip_handle_t atl_led_strip;                       //!< LED handle.
-static atl_led_rgb_color_t atl_led_rgb_color = {0, 0, 255};   //!< LED color (default: blue).
+static atl_led_rgb_color_t atl_led_rgb_color = {0, 0, 0};      //!< LED color.
 static TaskHandle_t atl_led_handle = NULL;                     //!< LED task handle.
 static uint8_t atl_button_count = 0;                           //!< Button pressed count.
 extern bool atl_button_pressed;                                //!< Button pressed.
@@ -41,33 +41,35 @@ static void atl_led_task(void *args) {
 
     ESP_LOGI(TAG, "LED task created");
 
+    /* Set run color */
+    atl_led_set_color(0, 0, 255);
+
     /* Task looping */
     while (true) {
 
         /* Check if button was pressed */
-        if (atl_button_pressed) {
+        while (atl_button_pressed) {
             atl_button_count++;
             
             /* Check if is factory reset */
             if (atl_button_count == 10) {
                 ESP_LOGW(TAG, ">>> Executing factory reset <<<");
-                atl_led_blink(10, 100, 255, 69, 0);
+                atl_led_blink_reboot();
                 atl_storage_erase_nvs();
                 esp_restart();
             }
 
             /* Toggle period */
+            atl_led_blink(2, 100, 255, 69, 0);
             vTaskDelay(pdMS_TO_TICKS(250));
 
-        } else {
-
-            /* Toggle period */
-            vTaskDelay(pdMS_TO_TICKS(CONFIG_ATL_LED_PERIOD));
-
         }
-
+        
         /* Toggle led builtin */
         atl_led_toggle();
+
+        /* Toggle period */
+        vTaskDelay(pdMS_TO_TICKS(CONFIG_ATL_LED_PERIOD));
     }    
 }
 
@@ -123,6 +125,7 @@ esp_err_t atl_led_init(void) {
     led_strip_rmt_config_t rmt_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,        //!< different clock source can lead to different power consumption.
         .resolution_hz = LED_STRIP_RMT_RES_HZ, //!< RMT counter clock frequency.
+        .mem_block_symbols = 64,               //!< Number of symbols that can be stored in one RMT memory block. Set this according to the number of LEDs in your strip and the timing parameters of your LED strip model.
         .flags.with_dma = false,               //!< DMA feature is available on ESP target like ESP32-S3.
     };         
 
@@ -135,7 +138,13 @@ esp_err_t atl_led_init(void) {
     }
 
     /* Power off led strip */
-    led_strip_clear(atl_led_strip);
+    atl_led_set_enabled(false);
+
+    /* Set LED to blue (initialization color) */
+    atl_led_set_color(0, 0, 255);
+    
+    /* Power on led strip */
+    atl_led_set_enabled(true);
 
     /* Create LED RGB task at selected CPU */
     if (xTaskCreatePinnedToCore(atl_led_task, "atl_led", 2048, NULL, 10, &atl_led_handle, 1) != pdPASS) {
@@ -188,30 +197,26 @@ esp_err_t atl_led_toggle(void) {
 
     /* Take semaphore */
     if (!xSemaphoreTake(atl_led_mutex, pdMS_TO_TICKS(atl_led_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking LED mutex");
+        ESP_LOGE(TAG, "Timeout taking LED mutex");
+        return ESP_ERR_TIMEOUT;
     }
-    
-    /* If the addressable LED is enabled */
-    if (atl_led_state == false) {
-
-        /* Set the LED on */
-        err = led_strip_set_pixel(atl_led_strip, 0, atl_led_rgb_color.red, atl_led_rgb_color.green, atl_led_rgb_color.blue);
-
-    } else {
-
-        /* Set all LED off */
-        err = led_strip_clear(atl_led_strip);
-    }
-    
-    /* Refresh the strip to send data */
-    err = led_strip_refresh(atl_led_strip);
     
     /* Update led state variable */
     atl_led_state = !atl_led_state;
-    
+
+    /* Change LED strip state */
+    if (atl_led_state == true) {
+        err = led_strip_set_pixel(atl_led_strip, 0, atl_led_rgb_color.red, atl_led_rgb_color.green, atl_led_rgb_color.blue);
+        err = led_strip_refresh(atl_led_strip);
+    } else {
+        err = led_strip_clear(atl_led_strip);
+        err = led_strip_refresh(atl_led_strip);
+    }
+
     /* Give semaphore */
     if (!xSemaphoreGive(atl_led_mutex)) {
-        ESP_LOGW(TAG, "Fail giving LED mutex");
+        ESP_LOGE(TAG, "Fail giving LED mutex");
+        return ESP_FAIL;
     }
 
     return err;
@@ -228,26 +233,27 @@ esp_err_t atl_led_toggle(void) {
 void atl_led_blink(uint8_t times, uint16_t interval, uint8_t red, uint8_t green, uint8_t blue) {
     /* Take semaphore */
     if (!xSemaphoreTake(atl_led_mutex, pdMS_TO_TICKS(atl_led_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking LED mutex");
+        ESP_LOGE(TAG, "Timeout taking LED mutex");
+        return;
     }
  
     /* Set all LED off to clear all pixels */
-    ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_clear(atl_led_strip));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_refresh(atl_led_strip));
+    led_strip_clear(atl_led_strip);
+    led_strip_refresh(atl_led_strip);
 
     /* Blink looping */    
     for (uint8_t i = 0; i < times; i++) {
         
         /* Set the LED on */
-        ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_set_pixel(atl_led_strip, 0, red, green, blue));
-        ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_refresh(atl_led_strip));
+        led_strip_set_pixel(atl_led_strip, 0, red, green, blue);
+        led_strip_refresh(atl_led_strip);
 
         /* Wait ON interval */
         vTaskDelay(pdMS_TO_TICKS(200));
 
         /* Set all LED off */
-        ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_clear(atl_led_strip));
-        ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_refresh(atl_led_strip));
+        led_strip_clear(atl_led_strip);
+        led_strip_refresh(atl_led_strip);
 
         /* Wait OFF interval */
         vTaskDelay(pdMS_TO_TICKS(interval));
@@ -255,7 +261,7 @@ void atl_led_blink(uint8_t times, uint16_t interval, uint8_t red, uint8_t green,
 
     /* Give semaphore */
     if (!xSemaphoreGive(atl_led_mutex)) {
-        ESP_LOGW(TAG, "Fail giving LED mutex");
+        ESP_LOGE(TAG, "Fail giving LED mutex");
     }
 
 }
@@ -269,7 +275,8 @@ void atl_led_blink(uint8_t times, uint16_t interval, uint8_t red, uint8_t green,
 void atl_led_set_color(uint8_t red, uint8_t green, uint8_t blue) {
     /* Take semaphore */
     if (!xSemaphoreTake(atl_led_mutex, pdMS_TO_TICKS(atl_led_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking LED mutex");
+        ESP_LOGE(TAG, "Timeout taking LED mutex");
+        return;
     }
 
     /* Update LED color */
@@ -289,21 +296,28 @@ void atl_led_set_color(uint8_t red, uint8_t green, uint8_t blue) {
  * @param [in] status enabled or disabled led
 */
 void atl_led_set_enabled(bool status) {
+    
     /* Take semaphore */
     if (!xSemaphoreTake(atl_led_mutex, pdMS_TO_TICKS(atl_led_mutex_timeout))) {
-        ESP_LOGW(TAG, "Timeout taking LED mutex");
+        ESP_LOGE(TAG, "Timeout taking LED mutex");
+        return;
     }
 
+    /* Update led state */
     atl_led_state = status;
+
+    /* Update LED strip */
     if (status == false) {
-        /* Power off led strip */
-        ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_clear(atl_led_strip));
-        ESP_ERROR_CHECK_WITHOUT_ABORT(led_strip_refresh(atl_led_strip));
+        led_strip_clear(atl_led_strip);
+        led_strip_refresh(atl_led_strip);
+    } else {
+        led_strip_set_pixel(atl_led_strip, 0, atl_led_rgb_color.red, atl_led_rgb_color.green, atl_led_rgb_color.blue);
+        led_strip_refresh(atl_led_strip);
     }
 
     /* Give semaphore */
     if (!xSemaphoreGive(atl_led_mutex)) {
-        ESP_LOGW(TAG, "Fail giving LED mutex");
+        ESP_LOGE(TAG, "Fail giving LED mutex");
     }
 }
 
